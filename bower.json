@@ -1,0 +1,26 @@
+{
+  "name": "node-vr-controller",
+  "description": "A vr server for controlling mouse movement from a phone in a google cardboard.",
+  "main": "index.js",
+  "authors": [
+    "jdtzmn <jdtzmn@gmail.com>"
+  ],
+  "license": "GPL-3.0",
+  "keywords": [
+    "vr",
+    "controller",
+    "iPhone",
+    "tilt",
+    "control",
+    "node"
+  ],
+  "homepage": "https://github.com/jdtzmn/node-vr-controller",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
