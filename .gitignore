@@ -114,5 +114,5 @@ bower_components
 ### Custom ###
 
 node_modules/**
-!node_modules/ffmpeg/ffmpeg
+!node_modules/ffmpeg/*
 !node_modules/.bin/ffmpeg
