@@ -1,5 +1,5 @@
 var Image, WebSocket
-let client = new WebSocket('ws://192.168.29.147:3000')
+let client = new WebSocket('ws://' + window.location.host)
 client.onmessage = function onmessage (event) {
   if (event.data.size === undefined) {
     let canvas = document.getElementById('video')
