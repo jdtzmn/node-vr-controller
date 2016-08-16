@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const path = require('path')
-// const ffmpeg = require('./lib/ffmpeg.js')
+const ffmpeg = require('./lib/ffmpeg.js')
 const robot = require('robotjs')
 const express = require('express')
 const bodyParser = require('body-parser')
@@ -33,7 +33,7 @@ let last = ''
 app.use(express.static(path.join(__dirname, '/www/dist')))
 app.use(bodyParser.urlencoded({ extended: true }))
 
-app.post('/:secret/:width?/:height?/:image', function (req, res) {
+app.post('/:secret/:width?/:height?/:image', (req, res) => {
   if (req.params.secret === secret) {
     width = req.params.width || 720
     height = req.params.height || 405
@@ -50,12 +50,12 @@ app.post('/:secret/:width?/:height?/:image', function (req, res) {
     var data = []
     var length = 0
 
-    req.on('data', function (chunk) {
+    req.on('data', (chunk) => {
       data.push(chunk)
       length += chunk.length
     })
 
-    req.on('end', function (chunk) {
+    req.on('end', (chunk) => {
       var buf = new Buffer(length)
       for (var i = 0, l = data.length, p = 0; i < l; i++) {
         data[i].copy(buf, p)
@@ -77,11 +77,11 @@ app.post('/:secret/:width?/:height?/:image', function (req, res) {
   }
 })
 
-app.get('/', function (req, res) {
+app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '/www/index.html'))
 })
 
-app.ws('/', function (socket, req) {
+app.ws('/', (socket, req) => {
   clients.push(socket)
 
   let header = new Buffer(8)
@@ -92,7 +92,7 @@ app.ws('/', function (socket, req) {
 
   console.log('New WebSocket Connection')
 
-  socket.on('message', function (event) {
+  socket.on('message', (event) => {
     if (event === 'invertX') {
       argv.i = !argv.i
       return
@@ -119,7 +119,7 @@ app.ws('/', function (socket, req) {
     robot.moveMouse(x, y)
   })
 
-  socket.on('disconnect', function () {
+  socket.on('disconnect', () => {
     if (clients.indexOf(socket) > -1) clients.splice(clients.indexOf(socket), 1)
     console.log('Socket disconnected')
   })
@@ -133,13 +133,10 @@ ws.broadcast = function (data, opts) {
   }
 }
 
-app.listen(port)
-console.log('Listening on port: ' + port)
-
-/*
-ffmpeg(process.platform, (err, msg, end) => {
-  if (end) return console.log('ffmpeg script finished')
-  if (err) console.error(err)
-  if (msg) console.log(msg)
+app.listen(port, () => {
+  console.log('Listening on port: ' + port)
+  ffmpeg(process.platform, 'http://localhost:' + port + '/' + secret + '/' + width + '/' + height + '/image-%3d.jpg', (err, msg) => {
+    if (err) console.error(err)
+    if (msg) console.log(msg)
+  })
 })
-*/
