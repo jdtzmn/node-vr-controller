@@ -12,8 +12,8 @@ let clients = []
 if (argv.h || !argv.s) {
   console.log(
 		'Usage: \n' +
-		'npm start  \n\n' +
-    'Flags: \n' +
+		'npm start [-- <args>]\n\n' +
+    'Arguments: \n' +
     '-h: Access this menu. \n' +
     '-p: Change the host port. \n' +
     '-s: Change the secret. \n' +
