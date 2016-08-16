@@ -115,4 +115,3 @@ bower_components
 
 node_modules/**
 !node_modules/ffmpeg/*
-!node_modules/.bin/ffmpeg
