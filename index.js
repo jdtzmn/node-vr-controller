@@ -9,7 +9,7 @@ const argv = require('minimist')(process.argv.slice(2))
 let ws = require('express-ws')(app)
 let clients = []
 
-if (argv.h) {
+if (argv.h || !argv.s) {
   console.log(
 		'Usage: \n' +
 		'npm start  \n\n' +
