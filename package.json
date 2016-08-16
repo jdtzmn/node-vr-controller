@@ -1,0 +1,47 @@
+{
+  "name": "node-vr-controller",
+  "version": "1.0.0",
+  "description": "A vr server for controlling mouse movement from a phone in a google cardboard.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jdtzmn/node-vr-controller.git"
+  },
+  "keywords": [
+    "vr",
+    "controller",
+    "iPhone",
+    "tilt",
+    "control",
+    "node"
+  ],
+  "author": "jdtzmn <jdtzmn@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jdtzmn/node-vr-controller/issues"
+  },
+  "homepage": "https://github.com/jdtzmn/node-vr-controller#readme",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "~4.13.4",
+    "express-ws": "^2.0.0-rc.1",
+    "minimist": "^1.2.0",
+    "robotjs": "^0.4.4"
+  },
+  "devDependencies": {
+    "babel-preset-es2015": "^6.13.2",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-concat": "^2.6.0",
+    "gulp-live-server": "0.0.30",
+    "gulp-notify": "^2.2.0",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-standard": "^7.0.1",
+    "gulp-uglify": "^2.0.0",
+    "gulp-uglifycss": "^1.0.6"
+  }
+}
