@@ -4,6 +4,8 @@ const ffmpeg = require('./lib/ffmpeg.js')
 const robot = require('robotjs')
 const express = require('express')
 const bodyParser = require('body-parser')
+const sha256 = require('sha256')
+const cookieParser = require('cookie-parser')
 const app = express()
 const os = require('os')
 const interfaces = os.networkInterfaces()
@@ -46,6 +48,16 @@ if (argv.h || !argv.s) {
 
 app.use(express.static(path.join(__dirname, '/www/dist')))
 app.use(bodyParser.urlencoded({ extended: true }))
+app.use(cookieParser())
+
+app.post('/secret', (req, res) => {
+  if (sha256(secret) === sha256(req.body.hash)) {
+    res.cookie('code', sha256(sha256(req.body.hash)), {expires: new Date(Date.now() + 8.64e+7), path: '/'})
+    res.redirect('/?code=' + sha256(sha256(req.body.hash)))
+  } else {
+    res.status(400).redirect('/secret?wrong')
+  }
+})
 
 app.post('/:secret/:width?/:height?/:image', (req, res) => {
   if (req.params.secret === secret) {
@@ -78,7 +90,15 @@ app.post('/:secret/:width?/:height?/:image', (req, res) => {
 })
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '/www/index.html'))
+  if (req.query.code && sha256(sha256(sha256(secret))) === sha256(req.query.code) || req.cookies.code && sha256(sha256(sha256(secret))) === sha256(req.cookies.code)) {
+    res.sendFile(path.join(__dirname, '/www/index.html'))
+  } else {
+    res.redirect('/secret')
+  }
+})
+
+app.get('/secret', (req, res) => {
+  res.sendFile(path.join(__dirname, '/www/secret.html'))
 })
 
 app.ws('/', (socket, req) => {
@@ -144,6 +164,9 @@ app.listen(port, () => {
   console.log('|                                 |')
   console.log('|  Turn on your phone and go to:  |')
   console.log('|  ' + domain + new Array(32 - domain.length).join(' ') + '|')
+  console.log('|                                 |')
+  console.log('|  Password:                      |')
+  console.log('|  ' + secret + new Array(32 - secret.length).join(' ') + '|')
   console.log('|                                 |')
   console.log(' ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\n')
 
