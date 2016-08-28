@@ -5,9 +5,29 @@ const robot = require('robotjs')
 const express = require('express')
 const bodyParser = require('body-parser')
 const app = express()
+const os = require('os')
+const interfaces = os.networkInterfaces()
 const argv = require('minimist')(process.argv.slice(2))
-let ws = require('express-ws')(app)
+const port = argv.p || process.env.PORT || 3000
+const secret = argv.s
+const mouseRatio = argv.r || 1
+const ws = require('express-ws')(app)
 let clients = []
+let addresses = []
+let width = argv.d && argv.d.split('x')[0] || 1000
+let height = argv.d && argv.d.split('x')[1] || 562
+let last = ''
+
+for (var i in interfaces) {
+  for (var i2 in interfaces[i]) {
+    var address = interfaces[i][i2]
+    if (address.family === 'IPv4' && !address.internal) {
+      addresses.push(address.address)
+    }
+  }
+}
+
+const domain = addresses[0] + ':' + port
 
 if (argv.h || !argv.s) {
   console.log(
@@ -15,20 +35,14 @@ if (argv.h || !argv.s) {
 		'npm start [-- <args>]\n\n' +
     'Arguments: \n' +
     '-h: Access this menu. \n' +
-    '-p: Change the host port. \n' +
-    '-s: Change the secret. \n' +
-    '-r: Ratio of rotation of phone to speed of mouse. \n' +
-    '-i: Invert the mouse movement (For computer control).'
+    '-p [3000]: Change the host port. \n' +
+    '-d [720x405]: Change the video dimensions. \n' +
+    '-s [\'12345\']: Change the secret. \n' +
+    '-r [1]: Ratio of rotation of phone to speed of mouse. \n' +
+    '-i [false]: Invert the mouse movement (For computer control).'
 	)
   process.exit()
 }
-
-const port = argv.p || process.env.PORT || 3000
-const secret = argv.s
-const mouseRatio = argv.r || 1
-let width = 720
-let height = 405
-let last = ''
 
 app.use(express.static(path.join(__dirname, '/www/dist')))
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -134,9 +148,18 @@ ws.broadcast = function (data, opts) {
 }
 
 app.listen(port, () => {
-  console.log('Listening on port: ' + port)
-  ffmpeg(process.platform, 'http://localhost:' + port + '/' + secret + '/' + width + '/' + height + '/image-%3d.jpg', (err, msg) => {
-    if (err) console.error(err)
-    if (msg) console.log(msg)
+  ffmpeg(process.platform, 'http://localhost:' + port + '/' + secret + '/' + width + '/' + height + '/image-%3d.jpg', height, width, (err, msg) => {
+    if (err) {} else if (msg) {
+      console.log(msg)
+    }
   })
+
+  console.log(' _________________________________')
+  console.log('|                                 |')
+  console.log('|  Turn on your phone and go to:  |')
+  console.log('|  ' + domain + new Array(32 - domain.length).join(' ') + '|')
+  console.log('|                                 |')
+  console.log(' ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\n')
+
+  console.log('Listening on port: ' + port)
 })
