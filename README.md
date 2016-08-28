@@ -16,13 +16,9 @@ $ node index.js -s pass
 
 ## Install
 
-```bash
-$ git clone https://github.com/jdtzmn/node-vr-controller.git
-
-  Cloning into 'node-vr-controller'...
-
-$ npm install
-```
+`$ git clone https://github.com/jdtzmn/node-vr-controller.git`
+Then:
+`$ npm install`
 
 ## Usage
 ```bash
