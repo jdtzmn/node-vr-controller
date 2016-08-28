@@ -27,6 +27,7 @@
   "homepage": "https://github.com/jdtzmn/node-vr-controller#readme",
   "dependencies": {
     "body-parser": "^1.15.2",
+    "bower": "^1.7.9",
     "express": "~4.13.4",
     "express-ws": "^2.0.0-rc.1",
     "minimist": "^1.2.0",
