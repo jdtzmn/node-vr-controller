@@ -136,7 +136,7 @@ app.ws('/', (socket, req) => {
     y += mouse.y
 
     robot.setMouseDelay(10)
-    robot.moveMouse(x, y)
+    robot.moveMouseGame(x, y)
   })
 
   socket.on('disconnect', () => {
