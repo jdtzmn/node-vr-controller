@@ -37,7 +37,6 @@ var touched = function (e) {
 }
 
 document.ontouchend = function () {
-  console.log(touches)
   if (touches > 3) {
     console.log('invertX')
     client.send('invertX')
