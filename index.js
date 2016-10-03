@@ -41,7 +41,8 @@ if (argv.h || !argv.s) {
     '-d [720x405]: Change the video dimensions. \n' +
     '-s [\'12345\']: Change the secret. \n' +
     '-r [1]: Ratio of rotation of phone to speed of mouse. \n' +
-    '-i [false]: Invert the mouse movement (For computer control).'
+    '-i [false]: Invert the mouse movement (For computer control). \n' +
+    '--simulatevr [false]: Simulate a vr game by mirroring the screen.'
 	)
   process.exit()
 }
@@ -91,6 +92,7 @@ app.post('/:secret/:width?/:height?/:image', (req, res) => {
 
 app.get('/', (req, res) => {
   if (req.query.code && sha256(sha256(sha256(secret))) === sha256(req.query.code) || req.cookies.code && sha256(sha256(sha256(secret))) === sha256(req.cookies.code)) {
+    if (req.cookies.code && req.query.code) return res.redirect('/')
     res.sendFile(path.join(__dirname, '/www/index.html'))
   } else {
     res.redirect('/secret')
@@ -127,7 +129,7 @@ app.ws('/', (socket, req) => {
     let data = JSON.parse(event)
     let mouse = robot.getMousePos()
     let y = Math.round(data.gamma)
-    let x = argv.i ? Math.round(data.alpha) : -Math.round(data.alpha)
+    let x = !argv.i ? Math.round(data.alpha) : -Math.round(data.alpha)
 
     x *= mouseRatio
     y *= mouseRatio
@@ -136,7 +138,7 @@ app.ws('/', (socket, req) => {
     y += mouse.y
 
     robot.setMouseDelay(10)
-    robot.moveMouseGame(x, y)
+    robot.moveMouse(x, y)
   })
 
   socket.on('disconnect', () => {
@@ -154,11 +156,15 @@ ws.broadcast = function (data) {
 }
 
 app.listen(port, () => {
-  ffmpeg(process.platform, 'http://localhost:' + port + '/' + secret + '/' + width + '/' + height + '/image-%3d.jpg', height, width, (err, msg) => {
-    if (err) {} else if (msg) {
-      console.log(msg)
-    }
-  })
+  if (!argv.f) {
+    ffmpeg(process.platform, 'http://localhost:' + port + '/' + secret + '/' + width + '/' + height + '/image-%3d.jpg', height, width, argv.simulatevr, (err, msg) => {
+      if (err) {} else if (msg) {
+        console.log(msg)
+      }
+    })
+  }
+
+  let displaypass = secret.length > 32 ? secret.substr(0, 28) + '...' : secret
 
   console.log(' _________________________________')
   console.log('|                                 |')
@@ -166,7 +172,7 @@ app.listen(port, () => {
   console.log('|  ' + domain + new Array(32 - domain.length).join(' ') + '|')
   console.log('|                                 |')
   console.log('|  Password:                      |')
-  console.log('|  ' + secret + new Array(32 - secret.length).join(' ') + '|')
+  console.log('|  ' + displaypass + new Array(32 - displaypass.length).join(' ') + '|')
   console.log('|                                 |')
   console.log(' ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\n')
 
