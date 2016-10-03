@@ -141,9 +141,11 @@ app.ws('/', (socket, req) => {
     robot.moveMouse(x, y)
   })
 
-  socket.on('disconnect', () => {
-    if (clients.indexOf(socket) > -1) clients.splice(clients.indexOf(socket), 1)
-    console.log('Socket disconnected')
+  socket.on('close', () => {
+    if (clients.indexOf(socket) > -1) {
+      clients.splice(clients.indexOf(socket), 1)
+      console.log('Socket disconnected')
+    }
   })
 })
 
