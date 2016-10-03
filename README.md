@@ -8,6 +8,9 @@ $ node index.js -s pass
   |  Turn on your phone and go to:  |
   |  127.0.0.1:3000                 |
   |                                 |
+  |  Password:                      |
+  |  pass                           |
+  |                                 |
    ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
 
    Listening on port: 3000
@@ -36,4 +39,5 @@ $ npm start
   -s ['12345']: Change the secret.
   -r [1]: Ratio of rotation of phone to speed of mouse.
   -i [false]: Invert the mouse movement (For computer control).
+  --simulatevr [false]: Simulate a vr game by mirroring the screen
 ```
