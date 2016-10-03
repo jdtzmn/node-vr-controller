@@ -1,4 +1,4 @@
-var FULLTILT, requestAnimationFrame, client, view, fulltiltOrientation
+var FULLTILT, requestAnimationFrame, client, view, fulltiltOrientation, platform
 
 let motion = new FULLTILT.getDeviceMotion()
 motion.then((motionData) => {
@@ -23,7 +23,7 @@ var sendOrientation = function () {
 sendOrientation()
 
 var inVR = function () {
-  if (view === 'minimal' && window.innerWidth > window.innerHeight && (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/BlackBerry/i) || navigator.userAgent.match(/iPhone|iPad|iPod/i))) {
+  if (!window.navigator.standalone && platform.os.family === 'iOS' && parseInt(platform.os.version, 10) >= 8 && view === 'minimal' || window.innerWidth > window.innerHeight && (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/BlackBerry/i) || navigator.userAgent.match(/iemobile/i))) {
     return true
   }
   return false
