@@ -42,6 +42,7 @@ if (argv.h || !argv.s) {
     '-s [\'12345\']: Change the secret. \n' +
     '-r [1]: Ratio of rotation of phone to speed of mouse. \n' +
     '-i [false]: Invert the mouse movement (For computer control). \n' +
+    '-m [1]: Choose a monitor to stream (Mac only). \n' +
     '--simulatevr [false]: Simulate a vr game by mirroring the screen.'
 	)
   process.exit()
@@ -129,7 +130,7 @@ app.ws('/', (socket, req) => {
     let data = JSON.parse(event)
     let mouse = robot.getMousePos()
     let y = Math.round(data.gamma)
-    let x = !argv.i ? Math.round(data.alpha) : -Math.round(data.alpha)
+    let x = argv.i ? Math.round(data.alpha) : -Math.round(data.alpha)
 
     x *= mouseRatio
     y *= mouseRatio
@@ -159,7 +160,7 @@ ws.broadcast = function (data) {
 
 app.listen(port, () => {
   if (!argv.f) {
-    ffmpeg(process.platform, 'http://localhost:' + port + '/' + secret + '/' + width + '/' + height + '/image-%3d.jpg', height, width, argv.simulatevr, (err, msg) => {
+    ffmpeg(process.platform, 'http://localhost:' + port + '/' + secret + '/' + width + '/' + height + '/image-%3d.jpg', height, width, undefined, argv.simulatevr, argv.m, (err, msg) => {
       if (err) {} else if (msg) {
         console.log(msg)
       }
