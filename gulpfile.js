@@ -42,7 +42,7 @@ gulp.task('serve', function () {
     }, 1000)
   })
 
-  gulp.watch('index.js', function () {
+  gulp.watch(['index.js', 'lib/ffmpeg.js'], function () {
     server.start.bind(server)()
   })
 })
