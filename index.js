@@ -4,14 +4,16 @@ const ffmpeg = require('./lib/ffmpeg.js')
 const robot = require('robotjs')
 const express = require('express')
 const bodyParser = require('body-parser')
+const uuid = require('uuid')
 const sha256 = require('sha256')
+const qrcode = require('qrcode-terminal')
 const cookieParser = require('cookie-parser')
 const app = express()
 const os = require('os')
 const interfaces = os.networkInterfaces()
 const argv = require('minimist')(process.argv.slice(2))
 const port = argv.p || process.env.PORT || 3000
-const secret = argv.s
+const secret = argv.s || uuid.v1()
 const mouseRatio = argv.r || 1
 const ws = require('express-ws')(app)
 let clients = []
@@ -31,7 +33,7 @@ for (var i in interfaces) {
 
 const domain = addresses[0] + ':' + port
 
-if (argv.h || !argv.s) {
+if (argv.h || argv.noqr && !argv.s) {
   console.log(
 		'Usage: \n' +
 		'npm start [-- <args>]\n\n' +
@@ -43,7 +45,8 @@ if (argv.h || !argv.s) {
     '-r [1]: Ratio of rotation of phone to speed of mouse. \n' +
     '-i [false]: Invert the mouse movement (For computer control). \n' +
     '-m [1]: Choose a monitor to stream (Mac only). \n' +
-    '--simulatevr [false]: Simulate a vr game by mirroring the screen.'
+    '--simulatevr [false]: Simulate a vr game by mirroring the screen. \n' +
+    '--noqr [false]: Disable the qr code for easy login feature.'
 	)
   process.exit()
 }
@@ -174,10 +177,18 @@ app.listen(port, () => {
   console.log('|  Turn on your phone and go to:  |')
   console.log('|  ' + domain + new Array(32 - domain.length).join(' ') + '|')
   console.log('|                                 |')
-  console.log('|  Password:                      |')
-  console.log('|  ' + displaypass + new Array(32 - displaypass.length).join(' ') + '|')
-  console.log('|                                 |')
+  if (argv.s) {
+    console.log('|  Password:                      |')
+    console.log('|  ' + displaypass + new Array(32 - displaypass.length).join(' ') + '|')
+    console.log('|                                 |')
+  }
   console.log(' ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾\n')
+  if (!argv.noqr) {
+    console.log('Then scan this (' + secret + '):\n')
+    qrcode.generate(secret, (qr) => {
+      console.log(qr + '\n')
+    })
+  }
 
   console.log('Listening on port: ' + port)
 })
