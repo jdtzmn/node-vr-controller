@@ -1,21 +1,7 @@
 # node-vr-controller
 Easily control vr apps using phone device motion
 
-```bash
-$ node index.js -s pass
-   _________________________________
-  |                                 |
-  |  Turn on your phone and go to:  |
-  |  127.0.0.1:3000                 |
-  |                                 |
-  |  Password:                      |
-  |  pass                           |
-  |                                 |
-   ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-
-   Listening on port: 3000
-   Stream : ::1: size: 1000x562
-```
+![command example](./src/cmd.png)
 
 ## Install
 
@@ -24,6 +10,10 @@ $ node index.js -s pass
 ##### 2. `$ npm install`
 
 ##### 3. `$ bower install`
+
+## Run
+
+#### `npm start [-- -h]`
 
 ## Usage
 ```bash
