@@ -11,13 +11,9 @@ Easily control vr apps using phone device motion
 
 ##### 3. `$ bower install`
 
-## Run
-
-#### `npm start [-- -h]`
-
 ## Usage
 ```bash
-$ npm start
+$ npm start -- -h
 
   Usage:
   npm start [-- <args>]
@@ -29,5 +25,6 @@ $ npm start
   -s ['12345']: Change the secret.
   -r [1]: Ratio of rotation of phone to speed of mouse.
   -i [false]: Invert the mouse movement (For computer control).
-  --simulatevr [false]: Simulate a vr game by mirroring the screen
+  --simulatevr [false]: Simulate a vr game by mirroring the screen.
+  --noqr [false]: Disable the qr code for easy login feature.
 ```
