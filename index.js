@@ -78,8 +78,22 @@ app.post('/:secret/:width?/:height?/:image', (req, res) => {
       last = msg
     }
 
-    req.on('data', (data) => {
-      ws.broadcast(data)
+    let data = []
+    let length = 0
+
+    req.on('data', (chunk) => {
+      data.push(chunk)
+      length += chunk.length
+    })
+
+    req.on('end', (chunk) => {
+      let buf = new Buffer(length)
+      for (let i = 0, l = data.length, p = 0; i < l; i++) {
+        data[i].copy(buf, p)
+        p += data[i].length
+      }
+
+      ws.broadcast(buf)
     })
   } else {
     let msg = 'Failed Stream Connection: ' +
@@ -156,7 +170,7 @@ app.ws('/', (socket, req) => {
 ws.broadcast = function (data) {
   for (var i in clients) {
     if (clients[i].readyState === 1) {
-      clients[i].send(data, {binary: true})
+      clients[i].send('data:image/jpeg;base64,' + data.toString('base64'), {binary: false})
     }
   }
 }
