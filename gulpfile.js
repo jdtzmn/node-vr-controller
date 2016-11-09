@@ -36,7 +36,7 @@ gulp.task('serve', function () {
   var server = gls.new(['index.js'].concat(process.argv.splice(2)))
   server.start()
 
-  gulp.watch(['www/lib/css/**/*.css', 'www/lib/js/**/*.js', 'www/**/*.html'], function (file) {
+  gulp.watch(['www/lib/css/**/*.css', 'www/lib/js/**/*.js', 'www/**/*.html', 'lib/ffmpeg.js'], function (file) {
     setTimeout(function () {
       server.notify.apply(server, [file])
     }, 1000)
