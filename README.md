@@ -1,21 +1,7 @@
 # node-vr-controller
 Easily control vr apps using phone device motion
 
-```bash
-$ node index.js -s pass
-   _________________________________
-  |                                 |
-  |  Turn on your phone and go to:  |
-  |  127.0.0.1:3000                 |
-  |                                 |
-  |  Password:                      |
-  |  pass                           |
-  |                                 |
-   ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
-
-   Listening on port: 3000
-   Stream : ::1: size: 1000x562
-```
+![command example](./src/cmd.png)
 
 ## Install
 
@@ -27,7 +13,7 @@ $ node index.js -s pass
 
 ## Usage
 ```bash
-$ npm start
+$ npm start -- -h
 
   Usage:
   npm start [-- <args>]
@@ -39,5 +25,6 @@ $ npm start
   -s ['12345']: Change the secret.
   -r [1]: Ratio of rotation of phone to speed of mouse.
   -i [false]: Invert the mouse movement (For computer control).
-  --simulatevr [false]: Simulate a vr game by mirroring the screen
+  --simulatevr [false]: Simulate a vr game by mirroring the screen.
+  --noqr [false]: Disable the qr code for easy login feature.
 ```
