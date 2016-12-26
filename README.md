@@ -28,3 +28,6 @@ $ npm start -- -h
   --simulatevr [false]: Simulate a vr game by mirroring the screen.
   --noqr [false]: Disable the qr code for easy login feature.
 ```
+## Code Style
+
+[![Standard - JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
