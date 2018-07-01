@@ -10,8 +10,6 @@ const qrcode = require('qrcode-terminal')
 const cookieParser = require('cookie-parser')
 const app = express()
 const server = require('http').Server(app)
-const WebSocketServer = require('uws').Server
-const uws = new WebSocketServer({server: server})
 const os = require('os')
 const interfaces = os.networkInterfaces()
 const argv = require('minimist')(process.argv.slice(2))
@@ -35,10 +33,24 @@ for (var i in interfaces) {
 
 const domain = addresses[0] + ':' + port
 
-if (argv.h || argv.noqr && !argv.s) {
+const WebSocketServer = require('uws').Server
+const uws = new WebSocketServer({
+  server,
+  verifyClient (info, verify) {
+    const req = info.req
+    /* use cookieParser to parse cookies */
+    cookieParser()(req, {}, () => {})
+
+    /* verify if the code is correct */
+    const isValidCode = req.cookies.code && sha256(sha256(sha256(secret))) === sha256(req.cookies.code)
+    verify(isValidCode, 401)
+  }
+})
+
+if (argv.h || (argv.noqr && !argv.s)) {
   console.log(
-		'Usage: \n' +
-		'npm start [-- <args>]\n\n' +
+    'Usage: \n' +
+    'npm start [-- <args>]\n\n' +
     'Arguments: \n' +
     '-h: Access this menu. \n' +
     '-p [3000]: Change the host port. \n' +
@@ -49,7 +61,7 @@ if (argv.h || argv.noqr && !argv.s) {
     '-m [1]: Choose a monitor to stream (Mac only). \n' +
     '--simulatevr [false]: Simulate a vr game by mirroring the screen. \n' +
     '--noqr [false]: Disable the qr code for easy login feature.'
-	)
+  )
   process.exit()
 }
 
@@ -89,7 +101,7 @@ app.post('/:secret/:width?/:height?/:image', (req, res) => {
     })
 
     req.on('end', (chunk) => {
-      let buf = new Buffer(length)
+      let buf = Buffer.alloc(length)
       for (let i = 0, l = data.length, p = 0; i < l; i++) {
         data[i].copy(buf, p)
         p += data[i].length
@@ -172,12 +184,12 @@ uws.on('connection', (socket) => {
 uws.broadcast = function (data) {
   for (var i in clients) {
     if (clients[i].readyState === 1) {
-      clients[i].send('data:image/jpeg;base64,' + data.toString('base64'), {binary: false})
+      clients[i].send(data, {binary: true})
     }
   }
 }
 
-server.listen(port, () => {
+server.listen(port, '0.0.0.0', () => {
   if (!argv.f) {
     ffmpeg(process.platform, 'http://localhost:' + port + '/' + secret + '/' + width + '/' + height + '/image-%3d.jpg', height, width, undefined, argv.simulatevr, argv.m, (err, msg) => {
       if (err) {} else if (msg) {
