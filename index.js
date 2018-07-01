@@ -18,8 +18,8 @@ const secret = argv.s || uuid.v1()
 const mouseRatio = argv.r || 1
 let clients = []
 let addresses = []
-let width = argv.d && argv.d.split('x')[0] || 1000
-let height = argv.d && argv.d.split('x')[1] || 562
+let width = argv.d && (argv.d.split('x')[0] || 1000)
+let height = argv.d && (argv.d.split('x')[1] || 562)
 let last = ''
 
 for (var i in interfaces) {
@@ -123,7 +123,7 @@ app.post('/:secret/:width?/:height?/:image', (req, res) => {
 })
 
 app.get('/', (req, res) => {
-  if (req.query.code && sha256(sha256(sha256(secret))) === sha256(req.query.code) || req.cookies.code && sha256(sha256(sha256(secret))) === sha256(req.cookies.code)) {
+  if ((req.query.code && sha256(sha256(sha256(secret))) === sha256(req.query.code)) || (req.cookies.code && sha256(sha256(sha256(secret))) === sha256(req.cookies.code))) {
     if (req.cookies.code && req.query.code) return res.redirect('/')
     res.sendFile(path.join(__dirname, '/www/index.html'))
   } else {
@@ -138,7 +138,7 @@ app.get('/secret', (req, res) => {
 uws.on('connection', (socket) => {
   clients.push(socket)
 
-  let header = new Buffer(8)
+  let header = Buffer.alloc(8)
   header.write('jsmp')
   header.writeUInt16BE(width, 4)
   header.writeUInt16BE(height, 6)
@@ -184,7 +184,7 @@ uws.on('connection', (socket) => {
 uws.broadcast = function (data) {
   for (var i in clients) {
     if (clients[i].readyState === 1) {
-      clients[i].send(data, {binary: true})
+      clients[i].send(data, { binary: true })
     }
   }
 }
