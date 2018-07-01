@@ -16,7 +16,6 @@ const argv = require('minimist')(process.argv.slice(2))
 const port = argv.p || process.env.PORT || 3000
 const secret = argv.s || uuid.v1()
 const mouseRatio = argv.r || 1
-let clients = []
 let addresses = []
 let width = (argv.d && argv.d.split('x')[0]) || 1000
 let height = (argv.d && argv.d.split('x')[1]) || 562
@@ -36,6 +35,7 @@ const domain = addresses[0] + ':' + port
 const WebSocketServer = require('uws').Server
 const uws = new WebSocketServer({
   server,
+  perMessageDeflate: false,
   verifyClient (info, verify) {
     const req = info.req
     /* use cookieParser to parse cookies */
@@ -78,11 +78,8 @@ app.post('/secret', (req, res) => {
   }
 })
 
-app.post('/:secret/:width?/:height?/:image', (req, res) => {
+app.post('/:secret', (req, res) => {
   if (req.params.secret === secret) {
-    width = req.params.width || 1000
-    height = req.params.height || 562
-
     let msg = 'Stream: ' +
       req.connection.remoteAddress + ':' +
       ' size: ' + width + 'x' + height
@@ -92,22 +89,12 @@ app.post('/:secret/:width?/:height?/:image', (req, res) => {
       last = msg
     }
 
-    let data = []
-    let length = 0
-
-    req.on('data', (chunk) => {
-      data.push(chunk)
-      length += chunk.length
+    req.on('data', (data) => {
+      uws.broadcast(data)
     })
 
-    req.on('end', (chunk) => {
-      let buf = Buffer.alloc(length)
-      for (let i = 0, l = data.length, p = 0; i < l; i++) {
-        data[i].copy(buf, p)
-        p += data[i].length
-      }
-
-      uws.broadcast(buf)
+    req.on('end', () => {
+      console.log('end')
     })
   } else {
     let msg = 'Failed Stream Connection: ' +
@@ -131,19 +118,15 @@ app.get('/', (req, res) => {
   }
 })
 
+app.get('/jsmpeg.min.js', (req, res) => {
+  res.sendFile(path.join(__dirname, './jsmpeg/jsmpeg.min.js'))
+})
+
 app.get('/secret', (req, res) => {
   res.sendFile(path.join(__dirname, '/www/secret.html'))
 })
 
 uws.on('connection', (socket) => {
-  clients.push(socket)
-
-  let header = Buffer.alloc(8)
-  header.write('jsmp')
-  header.writeUInt16BE(width, 4)
-  header.writeUInt16BE(height, 6)
-  socket.send(header, { binary: true })
-
   console.log('New WebSocket Connection')
 
   socket.on('message', (event) => {
@@ -173,25 +156,20 @@ uws.on('connection', (socket) => {
     robot.moveMouse(x, y)
   })
 
-  socket.on('close', () => {
-    if (clients.indexOf(socket) > -1) {
-      clients.splice(clients.indexOf(socket), 1)
-      console.log('Socket disconnected')
-    }
-  })
+  socket.on('close', () => console.log('Socket disconnected'))
 })
 
 uws.broadcast = function (data) {
-  for (var i in clients) {
-    if (clients[i].readyState === 1) {
-      clients[i].send(data, { binary: true })
+  uws.clients.forEach((client) => {
+    if (client.readyState === 1) {
+      client.send(data)
     }
-  }
+  })
 }
 
 server.listen(port, '0.0.0.0', () => {
-  if (!argv.f) {
-    ffmpeg(process.platform, 'http://localhost:' + port + '/' + secret + '/' + width + '/' + height + '/image-%3d.jpg', height, width, undefined, argv.simulatevr, argv.m, (err, msg) => {
+  if (!(argv.f || argv.noffmpeg)) {
+    ffmpeg(process.platform, 'http://localhost:' + port + '/' + secret, height, width, undefined, argv.simulatevr, argv.m, (err, msg) => {
       if (err) {} else if (msg) {
         console.log(msg)
       }
