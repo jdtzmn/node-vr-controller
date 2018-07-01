@@ -18,8 +18,8 @@ const secret = argv.s || uuid.v1()
 const mouseRatio = argv.r || 1
 let clients = []
 let addresses = []
-let width = argv.d && (argv.d.split('x')[0] || 1000)
-let height = argv.d && (argv.d.split('x')[1] || 562)
+let width = (argv.d && argv.d.split('x')[0]) || 1000
+let height = (argv.d && argv.d.split('x')[1]) || 562
 let last = ''
 
 for (var i in interfaces) {
@@ -80,8 +80,8 @@ app.post('/secret', (req, res) => {
 
 app.post('/:secret/:width?/:height?/:image', (req, res) => {
   if (req.params.secret === secret) {
-    width = req.params.width || 720
-    height = req.params.height || 405
+    width = req.params.width || 1000
+    height = req.params.height || 562
 
     let msg = 'Stream: ' +
       req.connection.remoteAddress + ':' +
